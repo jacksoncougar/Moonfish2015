@@ -86,12 +86,6 @@
     <Compile Include="GlobalStrings.cs" />
     <Compile Include="Graphics\BulletDebugDrawer.cs" />
     <Compile Include="Graphics\camera.cs" />
-    <Compile Include="Graphics\Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Graphics\Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Graphics\GraphicsEvents.cs" />
     <Compile Include="Graphics\GraphicsExtensions.cs" />
     <Compile Include="Graphics\Grid.cs" />
@@ -121,8 +115,8 @@
     <Compile Include="Graphics\ShaderViewer.Designer.cs">
       <DependentUpon>ShaderViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Graphics\Texture.cs" />
     <Compile Include="Graphics\Track.cs" />
-    <Compile Include="Graphics\UniformBuffer.cs" />
     <Compile Include="Guerilla\Class1.cs" />
     <Compile Include="Guerilla\ClassInfo.cs" />
     <Compile Include="Guerilla\GuerillaAttributes.cs" />
@@ -132,7 +126,7 @@
     <Compile Include="Guerilla\GuerillaToCs.cs" />
     <Compile Include="Guerilla\GuerillaToEnt.cs" />
     <Compile Include="Guerilla\MethodInfo.cs" />
-    <Compile Include="Guerilla\Preprocess\BitmapBlock.cs" />
+    <Compile Include="Guerilla\Preprocess\Bitmap.cs" />
     <Compile Include="Guerilla\Preprocess\ModelVariantRegionBlockBase.cs" />
     <Compile Include="Guerilla\Preprocess\ScenarioBlock.cs" />
     <Compile Include="Guerilla\Preprocess\ScenarioCutsceneTitleBlock.cs" />
@@ -678,9 +672,6 @@
     <Content Include="Documentation\vertex_resource_raw.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Graphics\Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Graphics\ShaderViewer.resx">
       <DependentUpon>ShaderViewer.cs</DependentUpon>
     </EmbeddedResource>

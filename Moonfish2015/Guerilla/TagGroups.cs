@@ -87,7 +87,7 @@ namespace Moonfish.Guerilla
         void Read(IntPtr h2LangLib, BinaryReader reader);
     }
 
-    public struct tag_field : IReadDefinition
+    public class tag_field : IReadDefinition
     {
         public field_type type;
         public short padding;
@@ -118,20 +118,20 @@ namespace Moonfish.Guerilla
             switch (type)
             {
                 case field_type._field_block:
-                    return reader.ReadFieldDefinition<TagBlockDefinition>(ref this);
+                    return reader.ReadFieldDefinition<TagBlockDefinition>(this);
                 case field_type._field_struct:
-                    return reader.ReadFieldDefinition<tag_struct_definition>(ref this);
+                    return reader.ReadFieldDefinition<tag_struct_definition>(this);
                 case field_type._field_char_enum:
                 case field_type._field_enum:
                 case field_type._field_long_enum:
                 case field_type._field_byte_flags:
                 case field_type._field_word_flags:
                 case field_type._field_long_flags:
-                    return reader.ReadFieldDefinition<enum_definition>(ref this);
+                    return reader.ReadFieldDefinition<enum_definition>(this);
                 case field_type._field_tag_reference:
-                    return reader.ReadFieldDefinition<tag_reference_definition>(ref this);
+                    return reader.ReadFieldDefinition<tag_reference_definition>(this);
                 case field_type._field_data:
-                    return reader.ReadFieldDefinition<tag_data_definition>(ref this);
+                    return reader.ReadFieldDefinition<tag_data_definition>(this);
                 default:
                     return definition;
             }

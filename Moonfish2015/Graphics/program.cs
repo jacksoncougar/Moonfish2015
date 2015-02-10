@@ -16,16 +16,6 @@ namespace Moonfish.Graphics
 
         public readonly string Name;
 
-        public UniformBuffer UniformBuffer { get; private set; }
-
-        public void BindUniformBuffer(UniformBuffer buffer, int bindingIndex)
-        {
-            this.UniformBuffer = buffer;
-            var uniformBlockIndex = GL.GetUniformBlockIndex(program_id, buffer.Name);
-            GL.UniformBlockBinding(program_id, uniformBlockIndex, bindingIndex);
-            OpenGL.ReportError();
-        }
-
         Dictionary<string, int> uniforms;
         Dictionary<Uniforms, string> globalUniforms;
         Dictionary<string, int> attributes;

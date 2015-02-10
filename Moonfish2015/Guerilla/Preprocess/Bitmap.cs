@@ -11,6 +11,26 @@ namespace Moonfish.Guerilla.Preprocess
         [GuerillaPreProcessMethod(BlockName = "bitmap_block")]
         protected static void GuerillaPreProcessMethod(BinaryReader binaryReader, IList<tag_field> fields)
         {
+            (fields[2].Definition as enum_definition).Options = new List<string>(new[] {
+                "TextureArray2D", 
+                "TextureArray3D", 
+                "Cubemaps", 
+                "Sprites", 
+                "Interface Bitmaps" });
+            (fields[4].Definition as enum_definition).Options = new List<string>(new[] { 
+                "Compressed with Color-Key Transparency", 
+                "Compressed with Explicit Alpha", 
+                "Compressed with Interpolated Alpha", 
+                "Color 16-Bit", 
+                "Color 32-Bit", 
+                "Monochrome" 
+            });
+            fields[12].Name = "Sprite Size";
+            var enumDefinition = (fields[12].Definition as enum_definition);
+            for (int i = 0; i < enumDefinition.Options.Count; ++i)
+            {
+                enumDefinition.Options[i] = string.Format("Size{0}", enumDefinition.Options[i]);
+            }
             var index = (from field in fields
                          where field.Name == "WDP fields"
                          select fields.IndexOf(field)).Single();
@@ -34,6 +54,7 @@ namespace Moonfish.Guerilla.Preprocess
         [GuerillaPreProcessMethod(BlockName = "bitmap_data_block")]
         protected static void GuerillaPreProcessMethod(BinaryReader binaryReader, IList<tag_field> fields)
         {
+            (fields[5].Definition as enum_definition).Options = new List<string>(new[] { "Texture2D", "Texture3D", "Cubemap" });
             var index = (from field in fields
                          where field.Name == "Pixels Offset*"
                          select fields.IndexOf(field)).Single();

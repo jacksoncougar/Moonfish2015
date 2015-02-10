@@ -23,9 +23,9 @@ void main()
 	vec4 diffuse = diffuseColour * max(dot(normal, lightNormal), 0.0);
 	diffuse = clamp(diffuse, 0.0, 1.0);
 		
-	float specularLevel = 0.1;
+	float specularLevel = 128f;
 	vec4 specular = vec4(0.2, 0.2, 0.2, 1.0)  * pow(max(dot(reflection, eyeNormal), 0.0), 0.3 * specularLevel);
-	specular = clamp(specular, 0.0, 0.0);
+	specular = clamp(specular, 0.0, 1.0);
 	
-	frag_color =  texture(diffuseTexture, varyingTexcoord.st) * max( ambient, diffuse );// + specular;
+	frag_color =  texture(diffuseTexture, varyingTexcoord.st) * max( ambient, diffuse ) + specular;
 }

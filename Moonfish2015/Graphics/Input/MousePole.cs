@@ -86,26 +86,27 @@ namespace Moonfish.Graphics.Input
 
         public void OnMouseDown( object sender, MouseEventArgs e )
         {
-            if( Hidden ) return;
-            var scene = sender as Form1;
-            if( scene != null && e.Button == MouseButtons.Left )
-            {
-                var callback = new BulletSharp.CollisionWorld.ClosestRayResultCallback( e.MouseRay.Origin, e.MouseRay.Origin + e.MouseRay.Direction * e.MouseRayFarPoint );
-                var collisionWorld = scene.CollisionManager.World;
-                collisionWorld.RayTest( e.MouseRay.Origin, e.MouseRay.Origin + e.MouseRay.Direction * e.MouseRayFarPoint, callback );
+            throw new NotImplementedException();
+            //if( Hidden ) return;
+            //var scene = sender;
+            //if( scene != null && e.Button == MouseButtons.Left )
+            //{
+            //    var callback = new BulletSharp.CollisionWorld.ClosestRayResultCallback( e.MouseRay.Origin, e.MouseRay.Origin + e.MouseRay.Direction * e.MouseRayFarPoint );
+            //    var collisionWorld = //scene.CollisionManager.World;
+            //    collisionWorld.RayTest( e.MouseRay.Origin, e.MouseRay.Origin + e.MouseRay.Direction * e.MouseRayFarPoint, callback );
 
-                if( callback.HasHit )
-                {
-                    if( callback.CollisionObject == rightContact )
-                        this.selectedAxis = SelectedAxis.U;
-                    else if( callback.CollisionObject == forwardContact )
-                        this.selectedAxis = SelectedAxis.V;
-                    else if( callback.CollisionObject == upContact )
-                        this.selectedAxis = SelectedAxis.W;
-                    else return;
-                    worldRegistrationPosition = callback.HitPointWorld - this.position;
-                }
-            }
+            //    if( callback.HasHit )
+            //    {
+            //        if( callback.CollisionObject == rightContact )
+            //            this.selectedAxis = SelectedAxis.U;
+            //        else if( callback.CollisionObject == forwardContact )
+            //            this.selectedAxis = SelectedAxis.V;
+            //        else if( callback.CollisionObject == upContact )
+            //            this.selectedAxis = SelectedAxis.W;
+            //        else return;
+            //        worldRegistrationPosition = callback.HitPointWorld - this.position;
+            //    }
+            //}
         }
 
         public void OnMouseUp( object sender, MouseEventArgs e )

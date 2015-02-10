@@ -94,9 +94,9 @@ namespace Moonfish.Guerilla.Tags
         internal enum TypeDeterminesBitmapGeometry : short
         
         {
-            InvalidName2DTexture = 0,
-            InvalidName3DTexture = 1,
-            CubeMap = 2,
+            Texture2D = 0,
+            Texture3D = 1,
+            Cubemap = 2,
         };
         internal enum FormatDeterminesHowPixelsAreRepresentedInternally : short
         

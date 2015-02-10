@@ -99,7 +99,7 @@ namespace Moonfish.Guerilla
             return definition;
         }
 
-        public static T ReadFieldDefinition<T>(this BinaryReader reader, ref tag_field field) where T : IReadDefinition, new()
+        public static T ReadFieldDefinition<T>(this BinaryReader reader, tag_field field) where T : IReadDefinition, new()
         {
             // Seek to the tag_block_definition address.
             reader.BaseStream.Position = field.definition - Guerilla.BaseAddress;

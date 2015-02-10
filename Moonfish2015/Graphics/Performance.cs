@@ -12,7 +12,6 @@ namespace Moonfish.Graphics
         struct FrameInfo
         {
             public float RenderTime;
-            public float WaitTime;
         }
 
         public float FramesPerSecond { get; private set; }

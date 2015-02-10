@@ -34,8 +34,8 @@ namespace Moonfish.Guerilla.Tags
         /// tApparent height of the bump map above the triangle onto which it is textured, in texture repeats (i.e., 1.0 would be as high as the texture is wide).
         /// </summary>
         internal float bumpHeightRepeats;
-        internal EMPTYSTRING eMPTYSTRING;
-        internal short eMPTYSTRING0;
+        internal SpriteSize spriteSize;
+        internal short eMPTYSTRING;
         internal short colorPlateWidthPixels;
         internal short colorPlateHeightPixels;
         internal byte[] data;
@@ -66,8 +66,8 @@ namespace Moonfish.Guerilla.Tags
             this.detailFadeFactor01 = binaryReader.ReadSingle();
             this.sharpenAmount01 = binaryReader.ReadSingle();
             this.bumpHeightRepeats = binaryReader.ReadSingle();
-            this.eMPTYSTRING = (EMPTYSTRING)binaryReader.ReadInt16();
-            this.eMPTYSTRING0 = binaryReader.ReadInt16();
+            this.spriteSize = (SpriteSize)binaryReader.ReadInt16();
+            this.eMPTYSTRING = binaryReader.ReadInt16();
             this.colorPlateWidthPixels = binaryReader.ReadInt16();
             this.colorPlateHeightPixels = binaryReader.ReadInt16();
             this.data = binaryReader.ReadBytes(8);
@@ -128,9 +128,9 @@ namespace Moonfish.Guerilla.Tags
         internal enum Type : short
         
         {
-            InvalidName2DTextures = 0,
-            InvalidName3DTextures = 1,
-            CubeMaps = 2,
+            TextureArray2D = 0,
+            TextureArray3D = 1,
+            Cubemaps = 2,
             Sprites = 3,
             InterfaceBitmaps = 4,
         };
@@ -140,8 +140,8 @@ namespace Moonfish.Guerilla.Tags
             CompressedWithColorKeyTransparency = 0,
             CompressedWithExplicitAlpha = 1,
             CompressedWithInterpolatedAlpha = 2,
-            InvalidName16BitColor = 3,
-            InvalidName32BitColor = 4,
+            Color16Bit = 3,
+            Color32Bit = 4,
             Monochrome = 5,
         };
         internal enum Usage : short
@@ -177,15 +177,15 @@ namespace Moonfish.Guerilla.Tags
             ImportMipmapChains = 2048,
             IntentionallyTrueColor = 4096,
         };
-        internal enum EMPTYSTRING : short
+        internal enum SpriteSize : short
         
         {
-            InvalidName32X32 = 0,
-            InvalidName64X64 = 1,
-            InvalidName128X128 = 2,
-            InvalidName256X256 = 3,
-            InvalidName512X512 = 4,
-            InvalidName1024X1024 = 5,
+            Size32X32 = 0,
+            Size64X64 = 1,
+            Size128X128 = 2,
+            Size256X256 = 3,
+            Size512X512 = 4,
+            Size1024X1024 = 5,
         };
         internal enum SpriteUsage : short
         

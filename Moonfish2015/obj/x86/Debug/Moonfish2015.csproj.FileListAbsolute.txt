@@ -1,5 +1,4 @@
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish2015.csprojResolveAssemblyReference.cache
-C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish.Graphics.Form1.resources
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish.Graphics.ShaderViewer.resources
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish2015.csproj.GenerateResource.Cache
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\bin\x86\Debug\Moonfish2015.pdb

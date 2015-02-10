@@ -51,7 +51,7 @@ void main()
 	diffuseColour  = colour;
 	vertexPosition = vec3(viewMatrix  * worldMatrix * objectExtents * position);
 	normal = normalize(normalMatrix * decompress(compressedNormal));
-	varyingTexcoord = texcoord;
+	varyingTexcoord = vec2(texcoord.s, -texcoord.t);
 	lightPosition = viewMatrix * vec4(LightPositionUniform, 1);
 	
     gl_Position = viewProjectionMatrix  * worldMatrix * objectExtents * position;
