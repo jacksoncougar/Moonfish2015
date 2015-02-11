@@ -2,7 +2,7 @@
 
 in vec4 position;
 in vec2 texcoord;
-in int compressedNormal;
+in int compressedNBTvectors[3];
 in vec4 colour; 
 in mat4 worldMatrix;
 in mat4 objectExtents;
@@ -10,12 +10,23 @@ in mat4 objectExtents;
 uniform mat4 viewProjectionMatrix;
 uniform mat4 viewMatrix; 
 uniform vec3 LightPositionUniform;
+uniform vec4 texcoordRangeUniform;
 
 smooth out vec3 normal;
+
+out mat3 TBN;
+
 smooth out vec4 diffuseColour;
 smooth out vec3 vertexPosition;
 smooth out vec4 lightPosition;
 smooth out vec2 varyingTexcoord;
+
+float decompress(in float value, in vec2 bounds)
+{
+	const float ushortMaxInverse = 1.0 / 65535.0;
+	const float ushortHalf = 32767.0;
+    return (((value + ushortHalf) * ushortMaxInverse ) * (bounds.y - bounds.x)) + bounds.x;
+}
 
 vec3 decompress(in int compressedNormal)
 {
@@ -50,8 +61,18 @@ void main()
 	mat3 normalMatrix = mat3(viewMatrix);	
 	diffuseColour  = colour;
 	vertexPosition = vec3(viewMatrix  * worldMatrix * objectExtents * position);
-	normal = normalize(normalMatrix * decompress(compressedNormal));
-	varyingTexcoord = vec2(texcoord.s, -texcoord.t);
+
+	vec3 vertexNormal_cameraspace = normalMatrix * normalize(decompress(compressedNBTvectors[0]));
+	vec3 vertexTangent_cameraspace =normalMatrix *  normalize(decompress(compressedNBTvectors[1]));
+	vec3 vertexBitangent_cameraspace = normalMatrix * normalize(decompress(compressedNBTvectors[2]));
+	
+	TBN = transpose(mat3(
+        vertexTangent_cameraspace,
+        vertexBitangent_cameraspace,
+        vertexNormal_cameraspace
+    ));
+
+	varyingTexcoord = vec2(decompress(texcoord.s, texcoordRangeUniform.xy), decompress(texcoord.t, texcoordRangeUniform.zw));
 	lightPosition = viewMatrix * vec4(LightPositionUniform, 1);
 	
     gl_Position = viewProjectionMatrix  * worldMatrix * objectExtents * position;

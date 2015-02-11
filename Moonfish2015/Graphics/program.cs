@@ -219,9 +219,20 @@ namespace Moonfish.Graphics
                 GL.UseProgram(this.program_id);
                 GL.Uniform3(uid, (Vector3)value);
             }
+            else if (t == typeof(Vector4))
+            {
+                GL.UseProgram(this.program_id);
+                GL.Uniform4(uid, (Vector4)value);
+            }
             else if (t == typeof(float))
             {
                 var temp = (float)value;
+                GL.UseProgram(this.program_id);
+                GL.Uniform1(uid, temp);
+            }
+            else if (t == typeof(int))
+            {
+                var temp = (int)value;
                 GL.UseProgram(this.program_id);
                 GL.Uniform1(uid, temp);
             }
