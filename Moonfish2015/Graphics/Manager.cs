@@ -195,13 +195,19 @@ namespace Moonfish.Graphics
                 );
             }
         }
-       
+
         public void Draw(Program shaderProgram)
         {
             if (shaderProgram == null) return;
             foreach (var item in objectInstances.SelectMany(x => x.Value))
             {
+                Vector4 texcoordRange = new Vector4(
+                    item.Model.RenderModel.compressionInfo[0].texcoordBoundsX.Min,
+                    item.Model.RenderModel.compressionInfo[0].texcoordBoundsX.Max,
+                    item.Model.RenderModel.compressionInfo[0].texcoordBoundsY.Min,
+                    item.Model.RenderModel.compressionInfo[0].texcoordBoundsY.Max);
                 shaderProgram.SetAttribute("worldMatrix", item.WorldMatrix);
+                shaderProgram["texcoordRangeUniform"] = texcoordRange;
                 IRenderable @object = item;
                 @object.Render(new[] { shaderProgram });
             }

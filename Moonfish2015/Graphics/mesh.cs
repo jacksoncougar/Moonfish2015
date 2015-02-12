@@ -93,7 +93,7 @@ namespace Moonfish.Graphics
                         GL.VertexAttribPointer( i, 3, VertexAttribPointerType.Short, true, attribute_size, 0 );
                         break;
                     case VertexAttributeType.texture_coordinate_compressed:
-                        GL.VertexAttribPointer( i, 2, VertexAttribPointerType.Short, true, attribute_size, 0 );
+                        GL.VertexAttribPointer( i, 2, VertexAttribPointerType.Short, false, attribute_size, 0 );
                         break;
                     case VertexAttributeType.tangent_space_unit_vectors_compressed:
                         GL.VertexAttribIPointer( i, 3, VertexAttribIntegerType.Int, attribute_size, IntPtr.Zero );
