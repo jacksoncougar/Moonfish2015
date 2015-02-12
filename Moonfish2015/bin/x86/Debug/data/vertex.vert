@@ -2,7 +2,7 @@
 
 in vec4 position;
 in vec2 texcoord;
-in int compressedNBTvectors[3];
+in int compressedNormal;
 in vec4 colour; 
 in mat4 worldMatrix;
 in mat4 objectExtents;
@@ -13,13 +13,12 @@ uniform vec3 LightPositionUniform;
 uniform vec4 texcoordRangeUniform;
 
 smooth out vec3 normal;
-
-out mat3 TBN;
-
 smooth out vec4 diffuseColour;
 smooth out vec3 vertexPosition;
 smooth out vec4 lightPosition;
 smooth out vec2 varyingTexcoord;
+
+
 
 float decompress(in float value, in vec2 bounds)
 {
@@ -55,23 +54,12 @@ vec3 decompress(in int compressedNormal)
 	
 	return vec3(x, y, z);
 }
-
 void main()
 {
 	mat3 normalMatrix = mat3(viewMatrix);	
 	diffuseColour  = colour;
 	vertexPosition = vec3(viewMatrix  * worldMatrix * objectExtents * position);
-
-	vec3 vertexNormal_cameraspace = normalMatrix * normalize(decompress(compressedNBTvectors[0]));
-	vec3 vertexTangent_cameraspace =normalMatrix *  normalize(decompress(compressedNBTvectors[1]));
-	vec3 vertexBitangent_cameraspace = normalMatrix * normalize(decompress(compressedNBTvectors[2]));
-	
-	TBN = transpose(mat3(
-        vertexTangent_cameraspace,
-        vertexBitangent_cameraspace,
-        vertexNormal_cameraspace
-    ));
-
+	normal = normalize(normalMatrix * decompress(compressedNormal));
 	varyingTexcoord = vec2(decompress(texcoord.s, texcoordRangeUniform.xy), decompress(texcoord.t, texcoordRangeUniform.zw));
 	lightPosition = viewMatrix * vec4(LightPositionUniform, 1);
 	

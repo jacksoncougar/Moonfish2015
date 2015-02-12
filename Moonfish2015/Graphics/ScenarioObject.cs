@@ -55,7 +55,7 @@ namespace Moonfish.Graphics
         public CollisionObject CollisionObject { get; set; }
         public Matrix4 WorldMatrix
         {
-            get { return worldMatrix; }
+            get { return Model.RenderModel.compressionInfo[0].ToExtentsMatrix() * worldMatrix; }
             set { worldMatrix = value; CollisionObject.WorldTransform = collisionSpaceMatrix * value; }
         }
         public NodeCollection Nodes { get; private set; }
