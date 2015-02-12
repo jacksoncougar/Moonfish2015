@@ -120,12 +120,9 @@ namespace Moonfish.Graphics
         private void LoadShader(Moonfish.Tag selectedShaderTag)
         {
             var shader = Map[selectedShaderTag.Identifier].Deserialize() as ShaderBlock;
-            try
-            {
-                shader.LoadShader(Map);
-                propertyGrid1.SelectedObject = shader;
-            }
-            catch { }
+
+            shader.LoadShader(Map);
+
         }
     }
 }
