@@ -35,7 +35,9 @@ namespace Moonfish.Graphics
             if( sectionBuffers.Count == 0 ) return;
             using( program.Use( ) )
             {
-                program.SetAttribute("colour", DiffuseColour.ToFloatRgba());
+                int colourAttribute = program.GetAttributeLocation("colour");
+                program.SetAttribute(colourAttribute, new ColorF(DiffuseColour).ToArray());
+
                 using( sectionBuffers.First( ).Bind( ) )
                 {
                     foreach( var part in sectionBuffers.First( ).Parts )

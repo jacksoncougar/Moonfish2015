@@ -12,6 +12,7 @@ namespace Moonfish.Graphics
         public const int SizeOfMatrix4 = (sizeof(float) * 4 * 4);
         public const float Phi = 1.6180339887f;
         public const float PhiConjugate = 0.6180339887f;
+        public const float Pi2 = (float)Math.PI * 2;
 
         public static T Clamp<T>(this T val, T min, T max) where T : IComparable<T>
         {
@@ -92,14 +93,17 @@ namespace Moonfish.Graphics
             return worldCoordinate;
         }
 
-        public static Vector3 Project(this Camera camera, Vector2 viewportCoordinates, float depth, ProjectionTarget projectionTarget = ProjectionTarget.World)
+        public static Vector3 Project(this Camera camera, Vector2 viewportCoordinates, float depth, 
+            ProjectionTarget projectionTarget = ProjectionTarget.World)
         {
             //  map depth to -1 to 1
             depth = Maths.Clamp<float>(depth, 0, 1) * 2 - 1;
-            return Project(camera.ViewMatrix, camera.ProjectionMatrix, new Vector3(viewportCoordinates.X, viewportCoordinates.Y, depth), (Rectangle)camera.Viewport, projectionTarget).Xyz;
+            return Project(camera.ViewMatrix, camera.ProjectionMatrix, 
+                new Vector3(viewportCoordinates.X, viewportCoordinates.Y, depth), (Rectangle)camera.Viewport, projectionTarget).Xyz;
         }
 
-        public static Vector3 UnProject(Matrix4 viewProjectionMatrix, Vector3 worldCoordinates, Rectangle viewport, ProjectionTarget projectionTarget = ProjectionTarget.NormalisedDeviceCoordinates)
+        public static Vector3 UnProject(Matrix4 viewProjectionMatrix, Vector3 worldCoordinates, Rectangle viewport, 
+            ProjectionTarget projectionTarget = ProjectionTarget.NormalisedDeviceCoordinates)
         {
             var normalisedCoordinate = new Vector4(worldCoordinates, 1);
             var matrix = viewProjectionMatrix;
@@ -130,5 +134,6 @@ namespace Moonfish.Graphics
         {
             return Maths.UnProject(camera.ViewProjectionMatrix, worldCoordinates, (Rectangle)camera.Viewport, projectionTarget);
         }
+
     }
 }

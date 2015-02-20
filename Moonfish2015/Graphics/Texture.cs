@@ -2,6 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,18 +13,22 @@ namespace Moonfish.Graphics
     {
         int handle;
 
-        public void Load(BitmapBlock bitmapCollection, MapStream map)
+        public void Load(BitmapBlock bitmapCollection, MapStream map, TextureUnit textureUnit, 
+            TextureMagFilter textureMagFilter = TextureMagFilter.Linear, TextureMinFilter textureMinFilter = TextureMinFilter.Linear)
         {
             handle = GL.GenTexture();
-            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.ActiveTexture(textureUnit);
 
             var workingBitmap = bitmapCollection.bitmaps[0];
             byte[] buffer = new byte[workingBitmap.lOD1TextureDataLength];
 
-            using (map.Pin())
+            Stream resourceStream;
+            Halo2.TryGettingResourceStream(workingBitmap.lOD1TextureDataOffset, out resourceStream);
+
+            using (resourceStream.Pin())
             {
-                map.Position = workingBitmap.lOD1TextureDataOffset;
-                map.Read(buffer, 0, buffer.Length);
+                resourceStream.Position = workingBitmap.lOD1TextureDataOffset & ~0xC0000000;
+                resourceStream.Read(buffer, 0, buffer.Length);
             }
 
             var width = workingBitmap.widthPixels;
@@ -42,8 +47,8 @@ namespace Moonfish.Graphics
                 case BitmapDataBlockBase.TypeDeterminesBitmapGeometry.Texture2D:
                     {
                         GL.BindTexture(TextureTarget.Texture2D, this.handle);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)textureMagFilter);
+                        GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)textureMinFilter);
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
                         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat); OpenGL.ReportError();
 
@@ -61,6 +66,45 @@ namespace Moonfish.Graphics
                             var pixelFormat = ParseBitapPixelFormat(workingBitmap.format);
                             var pixelType = ParseBitapPixelType(workingBitmap.format);
                             GL.TexImage2D(TextureTarget.Texture2D, 0, pixelInternalFormat, width, height, 0, pixelFormat, pixelType, surfaceData);
+                        }
+                    } break;
+                case BitmapDataBlockBase.TypeDeterminesBitmapGeometry.Cubemap:
+                    {
+                        GL.BindTexture(TextureTarget.TextureCubeMap, this.handle);
+                        GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMagFilter, (int)textureMagFilter);
+                        GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureMinFilter, (int)textureMinFilter);
+                        GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+                        GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+                        GL.TexParameter(TextureTarget.TextureCubeMap, TextureParameterName.TextureWrapR, (int)TextureWrapMode.ClampToEdge); OpenGL.ReportError();
+
+                        TextureTarget[] cube = { 
+                                                   TextureTarget.TextureCubeMapPositiveX,
+                                                   TextureTarget.TextureCubeMapNegativeX,
+                                                   TextureTarget.TextureCubeMapPositiveY,
+                                                   TextureTarget.TextureCubeMapNegativeY,
+                                                   TextureTarget.TextureCubeMapPositiveZ,
+                                                   TextureTarget.TextureCubeMapNegativeZ,
+                                               };
+
+                        for (int i = 0; i < 6; ++i)
+                        {
+
+                            byte[] surfaceData = new byte[(int)(bytesPerPixel * width * height)];
+                            int stride = buffer.Length / 6;
+                            Array.Copy(buffer, stride * i, surfaceData, 0, surfaceData.Length);
+
+
+                            if (workingBitmap.flags.HasFlag(BitmapDataBlock.Flags.Compressed))
+                            {
+                                GL.CompressedTexImage2D(
+                                    cube[i], 0, pixelInternalFormat, width, height, 0, (int)(bytesPerPixel * width * height), surfaceData);
+                            }
+                            else
+                            {
+                                var pixelFormat = ParseBitapPixelFormat(workingBitmap.format);
+                                var pixelType = ParseBitapPixelType(workingBitmap.format);
+                                GL.TexImage2D(cube[i], 0, pixelInternalFormat, width, height, 0, pixelFormat, pixelType, surfaceData);
+                            }
                         }
                     } break;
                 default: GL.DeleteTexture(this.handle); break;

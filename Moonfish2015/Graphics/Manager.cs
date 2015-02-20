@@ -88,14 +88,17 @@ namespace Moonfish.Graphics
         {
             if (Level == null) return;
 
-            shaded.SetAttribute("worldMatrix", Matrix4.Identity);
-            shaded.SetAttribute("objectExtents", Matrix4.Identity);
+            var worldMatrixAttribute = shaded.GetAttributeLocation("worldMatrix");
+            var objectMatrixAttribute = shaded.GetAttributeLocation("objectExtents");
+
+            shaded.SetAttribute(worldMatrixAttribute, Matrix4.Identity);
+            shaded.SetAttribute(objectMatrixAttribute, Matrix4.Identity);
 
             foreach (var item in ClusterObjects)
                 item.Render(shaded);
             foreach (var instance in this.Level.instancedGeometryInstances)
             {
-                shaded.SetAttribute("worldMatrix", instance.WorldMatrix);
+                shaded.SetAttribute(worldMatrixAttribute, instance.WorldMatrix);
                 InstancedGeometryObjects[(int)instance.instanceDefinition].Render(shaded);
             }
         }
@@ -206,8 +209,12 @@ namespace Moonfish.Graphics
                     item.Model.RenderModel.compressionInfo[0].texcoordBoundsX.Max,
                     item.Model.RenderModel.compressionInfo[0].texcoordBoundsY.Min,
                     item.Model.RenderModel.compressionInfo[0].texcoordBoundsY.Max);
-                shaderProgram.SetAttribute("worldMatrix", item.WorldMatrix);
-                shaderProgram["texcoordRangeUniform"] = texcoordRange;
+
+                var worldMatrixAttribute = shaderProgram.GetAttributeLocation("worldMatrix");
+                shaderProgram.SetAttribute(worldMatrixAttribute, item.WorldMatrix);
+
+                var texcoordRangeUniform = shaderProgram.GetUniformLocation("texcoordRangeUniform");
+                shaderProgram.SetUniform(texcoordRangeUniform, ref texcoordRange);
                 IRenderable @object = item;
                 @object.Render(new[] { shaderProgram });
             }
@@ -218,7 +225,8 @@ namespace Moonfish.Graphics
             if (program == null) return;
             foreach (var item in objectInstances.SelectMany(x => x.Value))
             {
-                program.SetAttribute("worldMatrix", item.WorldMatrix);
+                var worldMatrixAttribute = program.GetAttributeLocation("worldMatrix");
+                program.SetAttribute(worldMatrixAttribute, item.WorldMatrix);
                 IRenderable @object = item;
                 @object.Render(new[] { program });
             }

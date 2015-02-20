@@ -88,7 +88,7 @@ namespace Moonfish.Collision
 
         public static void DrawBox(ref OpenTK.Vector3 bbMin, ref OpenTK.Vector3 bbMax, ref OpenTK.Matrix4 trans, OpenTK.Graphics.Color4 color)
         {
-            using (debugProgram.Using("object_matrix", trans))
+            //using (debugProgram.Using("object_matrix", trans))
             using (Box box = new Box(bbMin, bbMax))
             {
                 GL.VertexAttrib3(1, new[] { 1f, 1f, 1f });
@@ -132,14 +132,16 @@ namespace Moonfish.Collision
 
             var rotation = Matrix4.Identity * Matrix4.CreateFromAxisAngle(axis, x);
             var translation = Matrix4.Identity * Matrix4.CreateTranslation(plane.Normal * plane.Distance);
+            var worldMatrix = translation * rotation;
             using (debugProgram.Use())
             {
-                debugProgram["object_matrix"] = translation * rotation;
+                var objectMatrixUniform = debugProgram.GetUniformLocation("object_matrix");
+                debugProgram.SetUniform(objectMatrixUniform, ref worldMatrix);
                 using (Grid grid = new Grid(new OpenTK.Vector3(0, 0, 0), new OpenTK.Vector2(1, 1), 8, 8))
                 {
                     grid.Draw();
                 }
-                debugProgram["object_matrix"] = Matrix4.Identity;
+                debugProgram.SetUniform(objectMatrixUniform, Matrix4.Identity);
             }
 
         }

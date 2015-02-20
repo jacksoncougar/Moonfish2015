@@ -16,6 +16,9 @@ namespace Moonfish.Graphics
         Stopwatch Timer { get; set; }
         public Camera Camera { get; set; }
 
+        OpenTK.Vector3 lightPosition = new OpenTK.Vector3(1, 1, 1);
+        float rotation = 0;
+
         public event EventHandler OnFrameReady;
 
         int NormalMapPaletteTexture;
@@ -32,19 +35,39 @@ namespace Moonfish.Graphics
             var vertex_shader = new Shader("data/vertex.vert", ShaderType.VertexShader);
             var fragment_shader = new Shader("data/fragment.frag", ShaderType.FragmentShader);
             defaultProgram = new Program("shaded"); OpenGL.ReportError();
-            GL.BindAttribLocation(defaultProgram.ID, 0, "position"); OpenGL.ReportError();
-            GL.BindAttribLocation(defaultProgram.ID, 1, "texcoord"); OpenGL.ReportError();
-            GL.BindAttribLocation(defaultProgram.ID, 2, "compressedNBTvectors"); OpenGL.ReportError();
-            GL.BindAttribLocation(defaultProgram.ID, 3, "colour"); OpenGL.ReportError();
+            GL.BindAttribLocation(defaultProgram.Ident, 0, "position"); OpenGL.ReportError();
+            GL.BindAttribLocation(defaultProgram.Ident, 1, "texcoord"); OpenGL.ReportError();
+            GL.BindAttribLocation(defaultProgram.Ident, 2, "iNormal"); OpenGL.ReportError();
+            GL.BindAttribLocation(defaultProgram.Ident, 3, "iTangent"); OpenGL.ReportError();
+            GL.BindAttribLocation(defaultProgram.Ident, 4, "iBitangent"); OpenGL.ReportError();
+
+            //GL.BindAttribLocation(defaultProgram.ID, 3, "colour"); OpenGL.ReportError();
             defaultProgram.Link(new List<Shader>(2) { vertex_shader, fragment_shader }); OpenGL.ReportError();
+            var loc = GL.GetAttribLocation(defaultProgram.Ident, "worldMatrix");
             Shaders["default"] = defaultProgram;
 
-            Shaders["default"]["LightPositionUniform"] = new OpenTK.Vector3(1, 1, 1);
 
             LoadNormalMapPalette();
+            OpenGL.ReportError();
 
-            Shaders["default"]["ColourPaletteUniform"] = 0;
-            Shaders["default"]["diffuseTexture"] = 1;
+            var p8NormalColourUniform = Shaders["default"].GetUniformLocation("P8NormalColour");
+            OpenGL.ReportError();
+            var p8NormalMapUniform = Shaders["default"].GetUniformLocation("P8NormalMap");
+            OpenGL.ReportError();
+            var diffuseMapUniform = Shaders["default"].GetUniformLocation("DiffuseMap");
+            OpenGL.ReportError();
+            var environmentMapUniform = Shaders["default"].GetUniformLocation("EnvironmentMap");
+            OpenGL.ReportError();
+
+            Shaders["default"].Use();
+            Shaders["default"].SetUniform(p8NormalColourUniform, 0);
+            OpenGL.ReportError();
+            Shaders["default"].SetUniform(p8NormalMapUniform, 1);
+            OpenGL.ReportError();
+            Shaders["default"].SetUniform(diffuseMapUniform, 2);
+            OpenGL.ReportError();
+            Shaders["default"].SetUniform(environmentMapUniform, 3);
+            OpenGL.ReportError();
 
 
         }
@@ -162,14 +185,22 @@ namespace Moonfish.Graphics
 
         void Camera_ViewMatrixChanged(object sender, MatrixChangedEventArgs e)
         {
-            foreach (var program in Shaders)
-                program.Value["viewMatrix"] = e.Matrix;
+            foreach (var program in Shaders.Values)
+            {
+                program.Use();
+                var viewMatrixUniform = program.GetUniformLocation("viewMatrix");
+                program.SetUniform(viewMatrixUniform, ref e.Matrix);
+            }
         }
 
         void Camera_ViewProjectionMatrixChanged(object sender, MatrixChangedEventArgs e)
         {
-            foreach (var program in Shaders)
-                program.Value["viewProjectionMatrix"] = e.Matrix;
+            foreach (var program in Shaders.Values)
+            {
+                program.Use();
+                var viewProjectionMatrixUniform = program.GetUniformLocation("viewProjectionMatrix");
+                program.SetUniform(viewProjectionMatrixUniform, ref e.Matrix);
+            }
         }
 
         public virtual void RenderFrame()
@@ -202,9 +233,20 @@ namespace Moonfish.Graphics
             ObjectManager.Draw(Shaders["default"]);
         }
 
+
+
         public virtual void Update()
         {
             //Console.WriteLine("Update()");
+
+            var R = OpenTK.Matrix4.CreateRotationZ(rotation);
+            rotation += OpenTK.MathHelper.DegreesToRadians(0.03f);
+            rotation = rotation > Maths.Pi2 ? 0 : rotation;
+            var l = OpenTK.Vector3.Transform(lightPosition, R); //Console.WriteLine(rotation);
+
+            var lightPositionAttribute = Shaders["default"].GetAttributeLocation("LightPositionUniform");
+            Shaders["default"].SetAttribute(lightPositionAttribute, new OpenTK.Vector4(l));
+
             Camera.Update();
         }
     };

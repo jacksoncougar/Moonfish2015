@@ -12,16 +12,12 @@ namespace Moonfish.Graphics
 {
     public class Program : IDisposable
     {
-        int program_id;
-
         public readonly string Name;
 
         Dictionary<string, int> uniforms;
-        Dictionary<Uniforms, string> globalUniforms;
         Dictionary<string, int> attributes;
-        Dictionary<string, Stack<Object>> uniformStack;
 
-        public int ID { get { return program_id; } }
+        public int Ident { get; private set; }
 
         public Program(string name)
         {
@@ -29,236 +25,110 @@ namespace Moonfish.Graphics
 
             attributes = new Dictionary<string, int>();
             uniforms = new Dictionary<string, int>();
-            uniformStack = new Dictionary<string, Stack<object>>();
-            globalUniforms = new Dictionary<Uniforms, string>();
-            globalUniforms[Uniforms.WorldMatrix] = "objectWorldMatrix";
-            globalUniforms[Uniforms.NormalizationMatrix] = "objectExtents";
-            globalUniforms[Uniforms.ViewProjectionMatrix] = "viewProjectionMatrix";
 
-            program_id = GL.CreateProgram();
+            Ident = GL.CreateProgram();
         }
 
         public void Link(List<Shader> shader_list)
         {
             foreach (Shader shader in shader_list)
             {
-                GL.AttachShader(program_id, shader.ID);
+                GL.AttachShader(Ident, shader.ID);
             }
 
-            GL.LinkProgram(program_id);
+            GL.LinkProgram(Ident);
 
             int status;
-            GL.GetProgram(program_id, GetProgramParameterName.LinkStatus, out status);
+            GL.GetProgram(Ident, GetProgramParameterName.LinkStatus, out status);
             if (status == 0)
             {
-                string program_log = GL.GetProgramInfoLog(program_id);
+                string program_log = GL.GetProgramInfoLog(Ident);
                 MessageBox.Show(String.Format("Linker failure: {0}\n", program_log));
             }
-            GL.ValidateProgram(program_id);
+            GL.ValidateProgram(Ident);
             int valid;
-            GL.GetProgram(program_id, GetProgramParameterName.ValidateStatus, out valid);
+            GL.GetProgram(Ident, GetProgramParameterName.ValidateStatus, out valid);
             if (valid == 0)
             {
-                string program_log = GL.GetProgramInfoLog(program_id);
+                string program_log = GL.GetProgramInfoLog(Ident);
                 MessageBox.Show(String.Format("Validation failure {0}", program_log));
             }
 
             foreach (Shader shader in shader_list)
             {
-                GL.DetachShader(program_id, shader.ID);
-            }
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-        }
-
-        private bool GetAttributeLocation(string name, out int location)
-        {
-            if (attributes.ContainsKey(name))
-            {
-                location = attributes[name];
-                return true;
-            }
-            else
-            {
-                location = GL.GetAttribLocation(this.ID, name);
-                if (location == -1)
-                {
-                    Console.WriteLine("invalid attribute name: {0}", name);
-                    return false;
-                }
-                else attributes[name] = location;
-                return true;
+                GL.DetachShader(Ident, shader.ID);
             }
         }
 
-        public void SetAttribute(string name, Vector4 value)
+        public int GetAttributeLocation(string name)
         {
             int location;
-            if (GetAttributeLocation(name, out location))
+            if (!attributes.TryGetValue(name, out location))
             {
-                GL.VertexAttrib4(location + 0,value);
+                attributes[name] = location = GL.GetAttribLocation(this.Ident, name);
             }
+            return location;
         }
 
-        public void SetAttribute(string name, float[] values)
+        public void SetAttribute(int location, Vector4 value)
+        {
+            GL.VertexAttrib4(location + 0, value);
+        }
+        public void SetAttribute(int location, float[] values)
+        {
+            GL.VertexAttrib4(location + 0, values);
+        }
+        public void SetAttribute(int location, Matrix4 value)
+        {
+            GL.VertexAttrib4(location + 0, value.Row0);
+            GL.VertexAttrib4(location + 1, value.Row1);
+            GL.VertexAttrib4(location + 2, value.Row2);
+            GL.VertexAttrib4(location + 3, value.Row3);
+        }
+
+        public int GetUniformLocation(string name)
         {
             int location;
-            if (GetAttributeLocation(name, out location))
+            if (!uniforms.TryGetValue(name, out location))
             {
-                GL.VertexAttrib4(location + 0, values);
+                location = uniforms[name] = GL.GetUniformLocation(this.Ident, name);
             }
+            return location;
         }
 
-        public void SetAttribute(string name, Matrix4 value)
+        public void SetUniform(int location, Matrix4 value)
         {
-            int location;
-            if (GetAttributeLocation(name, out location))
-            {
-                GL.VertexAttrib4(location + 0, value.Row0);
-                GL.VertexAttrib4(location + 1, value.Row1);
-                GL.VertexAttrib4(location + 2, value.Row2);
-                GL.VertexAttrib4(location + 3, value.Row3);
-            }
+            GL.UniformMatrix4(location, false, ref value);
         }
-
-        public IDisposable Using(string uniformName, object value)
+        public void SetUniform(int location, ref Matrix4 value)
         {
-            uniformStack[uniformName].Push(value);
-            this[uniformName] = uniformStack[uniformName].Pop();
-            return new UniformHandle(uniformStack[uniformName].Peek(), GetUniformID(uniformName));
+            GL.UniformMatrix4(location, false, ref value);
         }
-
-        private class UniformHandle : IDisposable
+        public void SetUniform(int location, ref Matrix3 value)
         {
-            Object previous_uniform_value;
-            int uniform_id;
-
-            public UniformHandle(Object previousUniformValue, int uniformID)
-            {
-                previous_uniform_value = previousUniformValue;
-                uniform_id = uniformID;
-            }
-
-            public void Dispose()
-            {
-                // Program.SetUniform(previous_uniform_value, uniform_id);
-            }
+            GL.UniformMatrix3(location, false, ref value);
         }
-
-        public object this[string uniform_name]
+        public void SetUniform(int location, ref Vector3 value)
         {
-            set
-            {
-                int uid;
-                uid = GetUniformID(uniform_name);
-                if (uid == -1) return;
-                if (!uniformStack.ContainsKey(uniform_name))
-                {
-                    uniformStack[uniform_name] = new Stack<object>();
-                    uniformStack[uniform_name].Push(value);
-                }
-                SetUniform(value, uid);
-            }
-            get
-            {
-                if (uniformStack.ContainsKey(uniform_name))
-                {
-                    return uniformStack[uniform_name].Peek();
-                }
-                return null;
-
-            }
-
+            GL.Uniform3(location, ref value);
         }
-
-        public Matrix4 this[Uniforms uniform]
+        public void SetUniform(int location, ref Vector4 value)
         {
-            get
-            {
-                return (Matrix4)this[globalUniforms[uniform]];
-            }
-            set
-            {
-                this[globalUniforms[uniform]] = value;
-            }
+            GL.Uniform4(location, ref value);
+        }
+        public void SetUniform(int location, float value)
+        {
+            GL.Uniform1(location, value);
+        }
+        public void SetUniform(int location, int value)
+        {
+            GL.Uniform1(location, value);
         }
 
-        private int GetUniformID(string uniform_name)
-        {
-            int uid;
-            if (uniforms.ContainsKey(uniform_name))
-                uid = uniforms[uniform_name];
-            else
-            {
-                GL.UseProgram(this.program_id);
-                uid = uniforms[uniform_name] = GL.GetUniformLocation(ID, uniform_name);
-            }
-            return uid;
-        }
-
-        private void SetUniform(object value, int uid)
-        {
-            Type t = value.GetType();
-            if (t == typeof(Matrix4))
-            {
-                var temp = (Matrix4)value;
-                GL.UseProgram(this.program_id);
-                GL.UniformMatrix4(uid, false, ref temp);
-            }
-            else if (t == typeof(Matrix3))
-            {
-                var temp = (Matrix3)value;
-                GL.UseProgram(this.program_id);
-                GL.UniformMatrix3(uid, false, ref temp);
-            }
-            else if (t == typeof(Vector3))
-            {
-                GL.UseProgram(this.program_id);
-                GL.Uniform3(uid, (Vector3)value);
-            }
-            else if (t == typeof(Vector4))
-            {
-                GL.UseProgram(this.program_id);
-                GL.Uniform4(uid, (Vector4)value);
-            }
-            else if (t == typeof(float))
-            {
-                var temp = (float)value;
-                GL.UseProgram(this.program_id);
-                GL.Uniform1(uid, temp);
-            }
-            else if (t == typeof(int))
-            {
-                var temp = (int)value;
-                GL.UseProgram(this.program_id);
-                GL.Uniform1(uid, temp);
-            }
-            else if (t.IsArray && t.GetElementType() == typeof(float))
-            {
-                var temp = (float[])value;
-                GL.UseProgram(this.program_id);
-                switch (temp.Length)
-                {
-                    case 1:
-                        GL.Uniform1(uid, 1, temp); break;
-                    case 2:
-                        GL.Uniform2(uid, 1, temp); break;
-                    case 3:
-                        GL.Uniform3(uid, 1, temp); break;
-                    case 4:
-                        GL.Uniform4(uid, 1, temp); break;
-                }
-                OpenGL.ReportError();
-            }
-            else throw new InvalidDataException();
-        }
 
         public IDisposable Use()
         {
-            GL.UseProgram(this.ID);
+            GL.UseProgram(this.Ident);
             return new Handle(0);
         }
 
@@ -279,7 +149,7 @@ namespace Moonfish.Graphics
 
         public void Dispose()
         {
-            GL.DeleteProgram(this.ID);
+            GL.DeleteProgram(this.Ident);
             GL.UseProgram(0);
         }
     }

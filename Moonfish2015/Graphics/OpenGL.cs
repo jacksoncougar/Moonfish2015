@@ -8,6 +8,8 @@ namespace Moonfish.Graphics
 {
     public static class OpenGL
     {
+        static Program activeProgram { get; set; }
+
         /// <summary>
         /// Enables the OpenGL capability for the lifespan of this object then disables the capability again
         /// </summary>

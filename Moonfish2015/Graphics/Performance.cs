@@ -15,6 +15,7 @@ namespace Moonfish.Graphics
         }
 
         public float FramesPerSecond { get; private set; }
+        public float FrameTime { get; private set; }
 
         Stopwatch Timer;
         FrameInfo[] frameHistory;
@@ -45,6 +46,7 @@ namespace Moonfish.Graphics
             var sum = 0.0f;
             foreach (var value in frameHistory) sum += value.RenderTime;
             FramesPerSecond = (float)((Stopwatch.Frequency / (sum / frameHistory.Length)));
+            FrameTime =  (float)sum / frameHistory.Length;
         }
 
         public float Delta { get { return (Timer.Elapsed - frameEnd).Milliseconds; } }

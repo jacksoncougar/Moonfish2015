@@ -120,15 +120,19 @@ namespace Moonfish.Graphics
                 using (program.Use())
                 {
                     var extents = Model.RenderModel.compressionInfo[0].ToExtentsMatrix();
-                    program.SetAttribute("objectExtents", extents);
-                    program.SetAttribute("colour", Selected ? Color.Yellow.ToFloatRgba() : Color.LightCoral.ToFloatRgba());
+
+                    var objectMatrixAttribute = program.GetAttributeLocation("objectExtents");
+                    var colourAttribute = program.GetAttributeLocation("colour");
+                                        
+                    program.SetAttribute(objectMatrixAttribute, extents);
+                    program.SetAttribute(colourAttribute, Selected ? Color.Yellow.ToFloatRgba() : Color.LightCoral.ToFloatRgba());
                     foreach (var region in Model.RenderModel.regions)
                     {
                         var section_index = region.permutations[0].l6SectionIndexHollywood;
                         var mesh = sectionBuffers[section_index];
                         using (mesh.Bind())
                         {
-                            GL.UseProgram(program.ID);
+                            GL.UseProgram(program.Ident);
                             foreach (var part in mesh.Parts)
                             {
                                 GL.DrawElements(PrimitiveType.TriangleStrip, part.stripLength, DrawElementsType.UnsignedShort,
@@ -154,7 +158,8 @@ namespace Moonfish.Graphics
 
                             var worldMatrix = this.Nodes.GetWorldMatrix(nodeIndex);
 
-                            program[Uniforms.WorldMatrix] = worldMatrix;
+                            var worldMatrixUniform = program.GetUniformLocation("worldMatrix");
+                            program.SetUniform(worldMatrixUniform, OpenTK.Matrix4.Identity);
 
                             if (selectedObjects.Contains(marker))
                             {

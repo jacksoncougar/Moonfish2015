@@ -58,7 +58,7 @@ namespace Moonfish.Graphics
             glControl1.MouseUp += Scene.Camera.OnMouseUp;
             glControl1.MouseCaptureChanged += Scene.Camera.OnMouseCaptureChanged;
 
-            var fileName = @"C:\Users\seed\Documents\Halo 2 Modding\mainmenu.map";
+            var fileName = @"C:\Users\seed\Documents\Halo 2 Modding\headlong.map";
             var directory = Path.GetDirectoryName(fileName);
             var maps = Directory.GetFiles(directory, "*.map", SearchOption.TopDirectoryOnly);
             var resourceMaps = maps.GroupBy(
@@ -72,13 +72,15 @@ namespace Moonfish.Graphics
                 .Select(g => g.First()).ToList();
             resourceMaps.ForEach(x => Halo2.LoadResource(new MapStream(x)));
             Map = new MapStream(fileName);
-            Scene.ObjectManager.Add(Map["hlmt", "masterchief"].Meta.Identifier,
-                new ScenarioObject((ModelBlock)(Map["hlmt", "masterchief"].Deserialize())));
+            Scene.ObjectManager.Add(Map["hlmt", "ghost"].Meta.Identifier,
+                new ScenarioObject((ModelBlock)(Map["hlmt", "ghost"].Deserialize())));
 
 
             var shaderTags = Map.Tags.Where(x => x.Type.ToString() == "shad").ToArray();
             listBox1.Items.AddRange(shaderTags);
             listBox1.DisplayMember = "Path";
+
+            listBox1.SelectedIndex = listBox1.FindString(@"objects\characters\masterchief\shaders\masterchief");
 
             //  firing this method is meant to load the view-projection matrix values into 
             //  the shader uniforms, and initalizes the camera
@@ -97,7 +99,7 @@ namespace Moonfish.Graphics
 
         void Scene_OnFrameReady(object sender, EventArgs e)
         {
-            this.Text = Scene.Performance.FramesPerSecond.ToString();
+            this.Text = string.Format("{0:###0.00}ms", TimeSpan.FromTicks((long)Scene.Performance.FrameTime).TotalMilliseconds);
             glControl1.SwapBuffers();
         }
 

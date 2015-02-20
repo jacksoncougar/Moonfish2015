@@ -348,7 +348,8 @@ namespace Moonfish.Graphics.Input
             using( shaderProgram.Use( ) )
             using( OpenGL.Enable( EnableCap.PrimitiveRestartFixedIndex ) )
             {
-                shaderProgram[Uniforms.WorldMatrix] = Matrix4.Identity;
+                var worldMatrixUniform = shaderProgram.GetUniformLocation("worldMatrix");
+                shaderProgram.SetUniform(worldMatrixUniform, Matrix4.Identity);
                 GL.BindVertexArray( glBuffers[0] );
                 GL.DrawElements( PrimitiveType.Lines, 6, DrawElementsType.UnsignedShort, IntPtr.Zero );
                 GL.DrawElements( PrimitiveType.TriangleFan, elementCount - 6, DrawElementsType.UnsignedShort, (IntPtr)12 );

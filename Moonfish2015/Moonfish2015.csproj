@@ -101,7 +101,7 @@
     <Compile Include="Graphics\OpenGL.cs" />
     <Compile Include="Graphics\Performance.cs" />
     <Compile Include="Graphics\Primitives.cs" />
-    <Compile Include="Graphics\program.cs" />
+    <Compile Include="Graphics\Program.cs" />
     <Compile Include="Graphics\RenderObject.cs" />
     <Compile Include="Graphics\resource.cs" />
     <Compile Include="Graphics\ScenarioObject.cs" />
