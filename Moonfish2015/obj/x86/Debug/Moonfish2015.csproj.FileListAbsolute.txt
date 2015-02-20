@@ -21,3 +21,5 @@ C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\bi
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\bin\x86\Debug\data\sys_vertex.vert
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\bin\x86\Debug\data\vertex.vert
 C:\Users\seed\Documents\Visual Studio 2012\Projects\Moonfish2015\Moonfish2015\bin\x86\Debug\data\viewscreen.vert
+C:\Users\seed\Documents\GitHub\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish2015.exe
+C:\Users\seed\Documents\GitHub\Moonfish2015\Moonfish2015\obj\x86\Debug\Moonfish2015.pdb
