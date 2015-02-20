@@ -27,7 +27,7 @@ namespace Moonfish.Graphics
             uniforms = new Dictionary<string, int>();
 
             Ident = GL.CreateProgram();
-            //kk;
+            //kk;hh
         }
 
         public void Link(List<Shader> shader_list)
