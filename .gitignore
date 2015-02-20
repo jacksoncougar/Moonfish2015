@@ -55,16 +55,16 @@ Temporary Items
 *.userprefs
 
 # Build results
-Moonfish2015/[Dd]ebug/
-Moonfish2015/[Dd]ebugPublic/
-Moonfish2015/[Rr]elease/
-Moonfish2015/[Rr]eleases/
+Moonfish2015/debug/
+Moonfish2015/debugPublic/
+Moonfish2015/release/
+Moonfish2015/releases/
 Moonfish2015/x64/
 Moonfish2015/x86/
 Moonfish2015/build/
 Moonfish2015/bld/
-Moonfish2015/[Bb]in/
-Moonfish2015/[Oo]bj/
+Moonfish2015/bin/
+Moonfish2015/obj/
 
 # Visual Studo 2015 cache/options directory
 .vs/
